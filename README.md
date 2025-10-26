@@ -4,7 +4,7 @@
 
 ## 📝 Abstract
 
-This study proposes a novel method for adapting CLIP to **cervical OCT** diagnosis by leveraging textual consistency to address **cross-center image variations**. Our approach utilizes LoRA to fine-tune CLIP efficiently and incorporates a dual-alignment mechanism to enhance consistency between image and text features across centers. Experimental results on **three datasets** demonstrate that our method outperforms existing SOTA approaches in various metrics and cross-center generalization performance, showcasing the potential of combining cross-modal learning with OCT imaging to advance automated cervical disease detection. 
+This study presents SAVLT, a structure-aware tuning framework that grounds textual semantics to anatomically plausible tissue regions. Concretely, SAVLT couples region-focused visual encoding with semantically stable, report-derived prompts, and trains the vision–language model with a lightweight parameter-efficient scheme. This design yields fine-grained, clinically meaningful alignment while requiring only coarse tissue/background masks as structural priors. Across a multi-center cohort and external single-center test sets, SAVLT attains state-of-the-art performance under few-shot settings and consistently improves cross-center robustness and interpretability.
 <p><strong>Tags:</strong> <code>Medical Imaging</code> <code>Cervical OCT </code> <code>CLIP Fine-tuning</code></p>
 
 
