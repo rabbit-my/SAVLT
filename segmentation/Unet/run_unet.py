@@ -47,7 +47,7 @@ def compute_metrics(outputs, masks):
 class Config:
     image_base = "/home/dataset/OCTseg/images/"
     mask_base = "/home/dataset/OCTseg/binary_mask/"
-    categories = ["外翻", "囊肿", "宫颈炎"]
+    categories = ["", "", ""]
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     batch_size = 256
     num_epochs = 50
