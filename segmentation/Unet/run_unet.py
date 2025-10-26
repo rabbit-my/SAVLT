@@ -18,29 +18,25 @@ from segmentation_models_pytorch.metrics import get_stats, iou_score
 import logging
 import sys
 
-# 设置日志保存路径
 log_path = "unet_train_log.txt"
 
-# 配置 logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler(log_path),         # 输出到文件
-        logging.StreamHandler(sys.stdout)      # 同时打印到控制台
+        logging.FileHandler(log_path),      
+        logging.StreamHandler(sys.stdout)
     ]
 )
 
-# 替换内置 print，让 print 的内容也写入日志
 print = logging.info
 
 
 def compute_metrics(outputs, masks):
-    # 确保mask形状和输出一致
     if masks.ndim == 3:  # [B, H, W]
         masks = masks.unsqueeze(1)  # -> [B, 1, H, W]
     
-    masks_int = (masks > 0.5).long()  # 二值化并转换为 long
+    masks_int = (masks > 0.5).long() 
     tp, fp, fn, tn = get_stats(outputs, masks_int, mode='binary', threshold=0.5)
     iou = iou_score(tp, fp, fn, tn, reduction='micro')
     dice = f1_score(tp, fp, fn, tn, reduction='micro')
@@ -48,7 +44,6 @@ def compute_metrics(outputs, masks):
 
 
 
-# 配置参数
 class Config:
     image_base = "/home/dataset/OCTseg/images/"
     mask_base = "/home/dataset/OCTseg/binary_mask/"
@@ -60,12 +55,11 @@ class Config:
     num_workers = 4
     encoder_name = 'resnet18'
     encoder_weights = 'imagenet'
-    n_splits = 5  # 5折交叉验证
-    image_size = 224  # 新增：统一图像大小
+    n_splits = 5 
+    image_size = 224  
 
 config = Config()
 
-# 定义数据增强变换
 def get_train_transforms():
     return A.Compose([
         A.RandomResizedCrop(
@@ -81,7 +75,7 @@ def get_train_transforms():
 def get_val_transforms():
     return A.Compose([
         A.RandomResizedCrop(
-            size=(config.image_size, config.image_size),  # 修改为元组形式
+            size=(config.image_size, config.image_size), 
             scale=(0.75, 1.0),
             interpolation=cv2.INTER_CUBIC
         ),
@@ -89,7 +83,7 @@ def get_val_transforms():
         ToTensorV2()
     ])
 
-# 自定义数据集类
+
 class SegmentationDataset(Dataset):
     def __init__(self, image_paths, mask_paths, transform=None):
         self.image_paths = image_paths
@@ -107,14 +101,13 @@ class SegmentationDataset(Dataset):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         
         mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
-        mask = (mask > 0).astype(np.float32)  # 确保是二值mask
+        mask = (mask > 0).astype(np.float32)  
         
         if self.transform:
             transformed = self.transform(image=image, mask=mask)
             image = transformed['image']
             mask = transformed['mask']
         else:
-            # 如果没有transform，至少确保转换为tensor
             image = torch.from_numpy(image.transpose(2, 0, 1)).float() / 255.0
             mask = torch.from_numpy(np.expand_dims(mask, axis=0)).float()
         
@@ -123,7 +116,6 @@ class SegmentationDataset(Dataset):
             'mask': mask
         }
 
-# 收集所有图像和mask路径
 def get_all_paths():
     image_paths = []
     mask_paths = []
@@ -161,7 +153,6 @@ def train_epoch(model, loader, optimizer, criterion, device):
         outputs = model(inputs)
         loss = criterion(outputs, masks)
         
-        # 计算指标
         iou, dice = compute_metrics(outputs, masks)
         
         loss.backward()
@@ -178,7 +169,6 @@ def train_epoch(model, loader, optimizer, criterion, device):
     return epoch_loss, epoch_iou, epoch_dice
 
 
-# 验证函数
 def validate_epoch(model, loader, criterion, device):
     model.eval()
     running_loss = 0.0
@@ -206,27 +196,21 @@ def validate_epoch(model, loader, criterion, device):
     
     return epoch_loss, epoch_iou, epoch_dice
 
-# 主训练流程
 def train_model():
-    # 获取所有数据路径
     image_paths, mask_paths = get_all_paths()
     
-    # 初始化KFold
     kfold = KFold(n_splits=config.n_splits, shuffle=True, random_state=42)
     
-    # 存储每折的结果
     fold_results = defaultdict(list)
     
     for fold, (train_idx, val_idx) in enumerate(kfold.split(image_paths)):
         print(f"\n{'='*30} Fold {fold + 1}/{config.n_splits} {'='*30}")
         
-        # 划分训练集和验证集
         train_image_paths = [image_paths[i] for i in train_idx]
         train_mask_paths = [mask_paths[i] for i in train_idx]
         val_image_paths = [image_paths[i] for i in val_idx]
         val_mask_paths = [mask_paths[i] for i in val_idx]
         
-        # 创建数据集和数据加载器
         train_dataset = SegmentationDataset(
             train_image_paths, 
             train_mask_paths, 
@@ -251,7 +235,6 @@ def train_model():
             num_workers=config.num_workers
         )
         
-        # 初始化模型
         model = Unet(
             encoder_name=config.encoder_name,
             encoder_weights=config.encoder_weights,
@@ -260,7 +243,6 @@ def train_model():
             activation='sigmoid'
         ).to(config.device)
         
-        # 损失函数和优化器
         criterion = DiceLoss(mode='binary')
         optimizer = optim.Adam(model.parameters(), lr=config.lr)
         scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3, factor=0.1)
@@ -270,12 +252,10 @@ def train_model():
         for epoch in range(config.num_epochs):
             print(f"\nEpoch {epoch + 1}/{config.num_epochs}")
             
-            # 训练
             train_loss, train_iou, train_dice = train_epoch(
                 model, train_loader, optimizer, criterion, config.device
             )
             
-            # 验证
             val_loss, val_iou, val_dice = validate_epoch(
                 model, val_loader, criterion, config.device
             )
@@ -287,13 +267,11 @@ def train_model():
                 f"Val Loss: {val_loss:.4f} | Val IoU: {val_iou:.4f} | Val Dice: {val_dice:.4f}"
             )
             
-            # 保存最佳模型
             if val_dice > best_val_dice:
                 best_val_dice = val_dice
                 torch.save(model.state_dict(), f"unet_best_model_fold{fold}.pth")
                 print(f"New best model saved with Dice: {best_val_dice:.4f}")
             
-            # 记录结果
             fold_results['fold'].append(fold)
             fold_results['epoch'].append(epoch)
             fold_results['train_loss'].append(train_loss)
@@ -303,7 +281,6 @@ def train_model():
             fold_results['val_iou'].append(val_iou)
             fold_results['val_dice'].append(val_dice)
     
-    # 打印交叉验证结果摘要
     print("\nCross-validation results summary:")
     for fold in range(config.n_splits):
         fold_idx = [i for i, f in enumerate(fold_results['fold']) if f == fold]
