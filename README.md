@@ -1,4 +1,4 @@
-# SAVLT: Structure-Aware Vision-Language Tuning for Multi-Center Cervical OCT Diagnosis
+# SAVLT:Structure-Aware Vision-Language Tuning for Multi-Center Cervical OCT Diagnosis
 
 ⭐ Star this repo if you find it useful!
 
