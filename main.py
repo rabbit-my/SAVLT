@@ -1,10 +1,7 @@
 """ how to run : python main.py  --use_vision_peft"""
 
 from utils.build_options import set_random_seed , build_default_options
-
 from model import load_clip_model, run_lora
-
-
 from datasets import build_dataset
 from datasets.utils import build_data_loader
 import os
