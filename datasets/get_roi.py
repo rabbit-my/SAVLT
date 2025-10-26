@@ -40,9 +40,6 @@ class ForegroundBBoxExtractor:
         return pred_mask
 
 def find_largest_foreground_bbox(mask, min_y_ratio=0.1):
-    """
-    从下半部分开始，找第一个全为1的行，返回该行到底部的最大矩形。
-    """
     h, w = mask.shape
     min_y = int(h * min_y_ratio)
 
