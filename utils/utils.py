@@ -141,7 +141,7 @@ def setup_logger(save_dir):
 
     logger = logging.getLogger()
     if logger.hasHandlers():
-        logger.handlers.clear()  # 清除之前绑定的 handler，防止 basicConfig 不生效
+        logger.handlers.clear() 
 
     logging.basicConfig(
         filename=log_file,
