@@ -74,32 +74,18 @@ Our code supports two options for dataset splits: using separate JSON files for 
 
 We written a runnable script using 32-shot as an example, with parameters that can be easily modified as needed：
 ```
-python 32shot_run_shell.py
+python run_shell.py
 ```
-You can set the result saving location in the `32shot_run_shell.py` file by modifying `output_dir = ""`.
-
-### Framework
-
-<img src="https://github.com/user-attachments/assets/4d89936f-b93b-4317-a099-4a0d1b85b61f" alt="image" width="650"/>
+You can set the result saving location in the `run_shell.py` file by modifying `output_dir = ""`.
 
 
-
-### Prompt for Text Encoder
-
-Here, we provide the prompts used in the paper for cervical OCT datasets. If you are using a different dataset, feel free to modify these text descriptions in our `prompt.py` file.
-
-<img src="https://github.com/user-attachments/assets/9d869c94-b3ef-41f3-8f75-3a8af6d74511" alt="image" width="650"/>
-
-### Mian Result
-
-<img src="https://github.com/user-attachments/assets/2c497714-f92f-4b9f-aa11-0e53849d32d8" alt="image" width="700"/>
 
 ## 💬 Contact
 
 For questions or collaborations:
 
 
-👉 [Submit an Issue](https://github.com/rabbit-my/DAPD/issues)
+👉 [Submit an Issue](https://github.com/rabbit-my/SAVLT/issues)
 
 Thank you for your attention!
 
