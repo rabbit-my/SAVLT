@@ -1,5 +1,4 @@
-
-
+# prompt C
 descriptions = {
     "mild_inflammation": 
         'Medical OCT image showing distinct layered structures with gray-white upper and lower layers',
