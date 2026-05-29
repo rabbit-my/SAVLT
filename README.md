@@ -42,7 +42,7 @@ Please create a folder named DATA and place the dataset inside it, organized in 
 
 ```
 $DATA/
-|–– mixed/
+|–– mixed-center_OCT_images/
     |–– images
         |–– class1
             |–– ×××1.png
@@ -51,9 +51,14 @@ $DATA/
         |–– class2
         ...
         |–– class5
-|–– huaxi/
+    |–– images
+        |–– split_fewshot
+            |–– ×××.pkl
+    |–– mixed-center_OCT_images.json
+
+|–– tiff_huaxi_modified_frame/
     ...
-|–– xiangya/
+|–– tiff_xiangya_frame_update/
     ...
 ```
 You can replace **mixed**, **huaxi**, and **xiangya** with your own dataset.
